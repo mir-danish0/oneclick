@@ -193,7 +193,8 @@ export function SocialDownloaderLayout({ tool }) {
     setLoading(true);
     setResults(null);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/social/info?url=${encodeURIComponent(url)}`);
+      const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+      const response = await fetch(`${apiBase}/api/social/info?url=${encodeURIComponent(url)}`);
       if (!response.ok) throw new Error('Could not fetch video info');
       const data = await response.json();
       
@@ -220,8 +221,8 @@ export function SocialDownloaderLayout({ tool }) {
   };
 
   const handleDownload = async (formatId, extension) => {
-    // For large files, we'll open in a new tab or use a direct link to the backend
-    const downloadUrl = `${import.meta.env.VITE_API_URL}/api/social/download?url=${encodeURIComponent(url)}&formatId=${formatId}`;
+    const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+    const downloadUrl = `${apiBase}/api/social/download?url=${encodeURIComponent(url)}&formatId=${formatId}`;
     window.open(downloadUrl, '_blank');
     toast.success('Download starting...');
   };

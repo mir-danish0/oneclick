@@ -21,6 +21,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = process.env.PORT || 5000;
 const TMP_DIR = path.resolve(__dirname, process.env.TMP_DIR || './tmp');
 const DIST_PATH = path.join(__dirname, 'dist');

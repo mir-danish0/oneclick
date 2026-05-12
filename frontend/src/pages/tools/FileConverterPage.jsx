@@ -59,7 +59,8 @@ export default function FileConverterPage() {
     }
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}`, {
+      const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+      const response = await fetch(`${apiBase}${endpoint}`, {
         method: 'POST',
         body: formData,
       });
