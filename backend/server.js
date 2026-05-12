@@ -22,8 +22,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const TMP_DIR = path.resolve(__dirname, process.env.TMP_DIR || './tmp');
+const DIST_PATH = path.join(__dirname, 'dist');
 
 // Ensure tmp directory exists
 if (!fs.existsSync(TMP_DIR)) {
@@ -31,7 +31,8 @@ if (!fs.existsSync(TMP_DIR)) {
 }
 
 // Middleware
-app.use(cors({ origin: [FRONTEND_URL, /\.yourproductiondomain\.com$/] }));
+app.use(cors()); // In monolith mode, CORS is less critical but good to keep for local dev
+app.use(express.static(DIST_PATH));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(globalLimiter);
@@ -46,6 +47,15 @@ app.use('/api/convert', convertRoutes);
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/download', downloadRoutes);
 app.use('/api/social', socialRoutes);
+
+// Catch-all route to serve the frontend index.html
+app.get('*', (req, res) => {
+  if (fs.existsSync(path.join(DIST_PATH, 'index.html'))) {
+    res.sendFile(path.join(DIST_PATH, 'index.html'));
+  } else {
+    res.status(404).send('Frontend not found. Make sure to build it.');
+  }
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

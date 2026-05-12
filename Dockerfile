@@ -1,15 +1,18 @@
-# Use a Debian-based Node image (Bookworm) so we can easily install LibreOffice via apt
+# --- Frontend Build Stage ---
+FROM node:20-bookworm AS frontend-builder
+WORKDIR /frontend
+COPY frontend/package*.json ./
+RUN npm install
+COPY frontend/ ./
+RUN npm run build
+
+# --- Backend & System Dependencies Stage ---
 FROM node:20-bookworm
 
-# Prevent interactive prompts during apt installations
+# Prevent interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies: 
-# - libreoffice (for office to pdf)
-# - ghostscript (for pdf compression)
-# - python3, pip, venv (for pdf scripts)
-# - poppler-utils (required by pdf2image)
-# - ffmpeg (required by yt-dlp for video processing)
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libreoffice \
     ghostscript \
@@ -20,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up a Python virtual environment and install Python dependencies
+# Set up Python virtual environment
 ENV VIRTUAL_ENV=/opt/venv
 RUN python3 -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
@@ -33,21 +36,24 @@ RUN pip install --no-cache-dir \
     Pillow \
     yt-dlp
 
-# Set the working directory to the backend folder
+# Working directory for backend
 WORKDIR /app
 
-# Copy the backend package.json and install Node dependencies
+# Copy backend package.json and install
 COPY backend/package*.json ./
 RUN npm ci
 
-# Copy the rest of the backend files
+# Copy backend source
 COPY backend/ ./
 
-# Create the tmp directory
+# Copy built frontend from the builder stage into backend's dist folder
+COPY --from=frontend-builder /frontend/dist ./dist
+
+# Create tmp directory
 RUN mkdir -p tmp
 
-# Expose the port the Express server runs on
+# Expose port 5000
 EXPOSE 5000
 
-# Start the Express server
+# Start server
 CMD ["npm", "start"]
