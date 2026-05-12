@@ -11,6 +11,7 @@ try:
     import pikepdf
     from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import letter
+    from pdf2docx import Converter
 except ImportError as e:
     print(f"Missing dependency: {e}. Please ensure pypdf, pdf2image, pikepdf, and reportlab are installed.", file=sys.stderr)
     sys.exit(1)
@@ -152,6 +153,16 @@ def watermark_pdf(input_path, output_path, text):
     except Exception as e:
         print(f"Watermark error: {e}", file=sys.stderr)
         sys.exit(1)
+        
+def pdf_to_docx(input_path, output_path):
+    try:
+        cv = Converter(input_path)
+        cv.convert(output_path)
+        cv.close()
+        print(output_path)
+    except Exception as e:
+        print(f"PDF to Word error: {e}", file=sys.stderr)
+        sys.exit(1)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -181,3 +192,5 @@ if __name__ == "__main__":
         unlock_pdf(args.input, args.output, args.password)
     elif args.action == 'watermark':
         watermark_pdf(args.input, args.output, args.text)
+    elif args.action == 'to-docx':
+        pdf_to_docx(args.input, args.output)

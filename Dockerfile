@@ -34,7 +34,8 @@ RUN pip install --no-cache-dir \
     pikepdf \
     reportlab \
     Pillow \
-    yt-dlp
+    yt-dlp \
+    pdf2docx
 
 # Working directory for backend
 WORKDIR /app
