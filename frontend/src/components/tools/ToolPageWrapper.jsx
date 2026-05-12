@@ -191,20 +191,39 @@ export function SocialDownloaderLayout({ tool }) {
   const handleFetch = async () => {
     if (!url.trim()) return toast.error('Please paste a valid URL');
     setLoading(true);
-    // Simulate API call
-    await new Promise(r => setTimeout(r, 1500));
-    setResults({
-      title: 'Sample Video Title — Downloaded via OneClick',
-      thumbnail: null,
-      qualities: [
-        { label: '1080p HD', size: '45.2 MB', badge: 'Best' },
-        { label: '720p', size: '22.8 MB', badge: null },
-        { label: '360p', size: '8.5 MB', badge: null },
-        { label: 'Audio Only', size: '3.2 MB', badge: null },
-      ],
-    });
+    setResults(null);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/social/info?url=${encodeURIComponent(url)}`);
+      if (!response.ok) throw new Error('Could not fetch video info');
+      const data = await response.json();
+      
+      // Map backend formats to the UI format
+      const qualities = data.formats.map(f => ({
+        formatId: f.formatId,
+        label: `${f.resolution} (${f.extension})`,
+        size: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(1)} MB` : 'Size unknown',
+        badge: f.note.includes('premium') ? 'HQ' : null,
+        extension: f.extension
+      }));
+
+      setResults({
+        title: data.title,
+        thumbnail: data.thumbnail,
+        qualities: qualities,
+      });
+      toast.success('Video found!');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to fetch video. Check the URL and try again.');
+    }
     setLoading(false);
-    toast.success('Video found!');
+  };
+
+  const handleDownload = async (formatId, extension) => {
+    // For large files, we'll open in a new tab or use a direct link to the backend
+    const downloadUrl = `${import.meta.env.VITE_API_URL}/api/social/download?url=${encodeURIComponent(url)}&formatId=${formatId}`;
+    window.open(downloadUrl, '_blank');
+    toast.success('Download starting...');
   };
 
   return (
@@ -237,8 +256,12 @@ export function SocialDownloaderLayout({ tool }) {
           {/* Video info */}
           <div className="bg-[#0f0f1a] rounded-xl p-5 border border-[#1e1e32]">
             <div className="flex gap-4">
-              <div className="w-32 h-20 rounded-lg bg-[#1e1e32] flex items-center justify-center shrink-0">
-                <span className="text-3xl">🎬</span>
+              <div className="w-32 h-20 rounded-lg bg-[#1e1e32] flex items-center justify-center shrink-0 overflow-hidden">
+                {results.thumbnail ? (
+                  <img src={results.thumbnail} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-3xl">🎬</span>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{results.title}</p>
@@ -262,7 +285,10 @@ export function SocialDownloaderLayout({ tool }) {
                   </div>
                   <span className="text-xs text-[#4a4a6a]">{q.size}</span>
                 </div>
-                <button className="px-5 py-2 rounded-lg bg-[#00d4ff15] text-[#00d4ff] text-sm font-medium hover:bg-[#00d4ff25] transition-all flex items-center gap-1.5">
+                <button 
+                  onClick={() => handleDownload(q.formatId, q.extension)}
+                  className="px-5 py-2 rounded-lg bg-[#00d4ff15] text-[#00d4ff] text-sm font-medium hover:bg-[#00d4ff25] transition-all flex items-center gap-1.5"
+                >
                   <Download className="w-3.5 h-3.5" />
                   Download
                 </button>

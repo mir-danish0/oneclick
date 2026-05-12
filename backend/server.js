@@ -13,6 +13,7 @@ import { startPeriodicCleanup } from './utils/cleanupFiles.js';
 import convertRoutes from './routes/convert.js';
 import pdfRoutes from './routes/pdf.js';
 import downloadRoutes from './routes/download.js';
+import socialRoutes from './routes/social.js';
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ app.use(globalLimiter);
 app.use('/api/convert', convertRoutes);
 app.use('/api/pdf', pdfRoutes);
 app.use('/api/download', downloadRoutes);
+app.use('/api/social', socialRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
