@@ -36,6 +36,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(globalLimiter);
 
+// Health check
+app.get('/', (req, res) => {
+  res.json({ status: 'active', message: 'OneClick API is running' });
+});
+
 // Routes
 app.use('/api/convert', convertRoutes);
 app.use('/api/pdf', pdfRoutes);
