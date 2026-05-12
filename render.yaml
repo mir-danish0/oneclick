@@ -11,8 +11,8 @@ services:
       - key: PORT
         value: 5000
       - key: FRONTEND_URL
-        # This will be updated to your actual frontend URL once deployed
-        value: "https://oneclick.onrender.com" 
+        # Update this to your actual frontend URL once deployed
+        value: "https://oneclick-frontend.onrender.com" 
 
   # The Frontend Service (Static Site)
   - type: web
@@ -22,6 +22,9 @@ services:
     staticPublishPath: ./frontend/dist
     region: oregon
     plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: "https://oneclick-6v4g.onrender.com"
     routes:
       - type: rewrite
         source: /*
