@@ -1,0 +1,28 @@
+services:
+  # The Backend Service
+  - type: web
+    name: oneclick-backend
+    env: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: FRONTEND_URL
+        # This will be updated to your actual frontend URL once deployed
+        value: "https://oneclick.onrender.com" 
+
+  # The Frontend Service (Static Site)
+  - type: web
+    name: oneclick-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    region: oregon
+    plan: free
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
