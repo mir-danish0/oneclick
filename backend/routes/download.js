@@ -1,8 +1,6 @@
 import express from 'express';
-import { spawn, exec } from 'child_process';
-import { promisify } from 'util';
+import { fetchVideoInfo, spawnVideoDownload } from '../utils/ytdlp.js';
 
-const execAsync = promisify(exec);
 const router = express.Router();
 
 // POST /api/download/info
@@ -11,8 +9,7 @@ router.post('/info', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    const { stdout } = await execAsync(`yt-dlp --dump-json "${url}"`);
-    const data = JSON.parse(stdout);
+    const data = await fetchVideoInfo(url);
     
     // Extract formats with video (ignore formats that are audio only unless it's the only option, but mostly let's filter)
     const formats = data.formats
@@ -34,7 +31,10 @@ router.post('/info', async (req, res) => {
     });
   } catch (err) {
     console.error('yt-dlp error:', err);
-    res.status(500).json({ error: 'Failed to fetch video info. Ensure URL is valid.' });
+    const message = err.message.includes('Rate limited') 
+      ? err.message 
+      : 'Failed to fetch video info. Ensure URL is valid and the platform is not blocking the request.';
+    res.status(500).json({ error: message });
   }
 });
 
@@ -44,10 +44,8 @@ router.post('/video', (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    const formatArg = format_id ? ['-f', format_id] : ['-f', 'best'];
-    
-    // Use yt-dlp to stream output to stdout
-    const ytdlp = spawn('yt-dlp', [...formatArg, '-o', '-', url]);
+    // Spawn yt-dlp to stream output to stdout
+    const ytdlp = spawnVideoDownload(url, format_id);
 
     res.setHeader('Content-Disposition', `attachment; filename="downloaded_video.mp4"`);
     res.setHeader('Content-Type', 'application/octet-stream');
@@ -55,13 +53,14 @@ router.post('/video', (req, res) => {
     ytdlp.stdout.pipe(res);
 
     ytdlp.stderr.on('data', (data) => {
-      console.log(`yt-dlp stderr: ${data}`);
+      if (data.toString().includes('ERROR')) {
+        console.error(`yt-dlp stderr: ${data}`);
+      }
     });
 
     ytdlp.on('close', (code) => {
       if (code !== 0) {
         console.error(`yt-dlp process exited with code ${code}`);
-        // Cannot send 500 here since headers are already sent, stream will just end
       }
     });
 

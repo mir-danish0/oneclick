@@ -1,9 +1,6 @@
 import express from 'express';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
+import { fetchVideoInfo, spawnVideoDownload } from '../utils/ytdlp.js';
 
-const execAsync = promisify(exec);
 const router = express.Router();
 
 // GET /api/social/info?url=<url>
@@ -12,9 +9,7 @@ router.get('/info', async (req, res) => {
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
   try {
-    // -j: dump json, --no-playlist: only single video
-    const { stdout } = await execAsync(`yt-dlp -j --no-playlist "${url}"`);
-    const info = JSON.parse(stdout);
+    const info = await fetchVideoInfo(url);
 
     // Filter and simplify formats for the frontend
     const formats = info.formats
@@ -39,7 +34,10 @@ router.get('/info', async (req, res) => {
     });
   } catch (err) {
     console.error('yt-dlp info error:', err);
-    res.status(500).json({ error: 'Could not fetch video info' });
+    const message = err.message.includes('Rate limited') 
+      ? err.message 
+      : 'Could not fetch video info. The platform might be blocking the request.';
+    res.status(500).json({ error: message });
   }
 });
 
@@ -50,8 +48,7 @@ router.get('/download', async (req, res) => {
 
   try {
     // Get info first to get the title for filename
-    const { stdout: infoStr } = await execAsync(`yt-dlp -j --no-playlist "${url}"`);
-    const info = JSON.parse(infoStr);
+    const info = await fetchVideoInfo(url);
     const safeTitle = info.title.replace(/[^\w\s-]/g, '').trim();
 
     // Set headers for download
@@ -59,15 +56,20 @@ router.get('/download', async (req, res) => {
     res.setHeader('Content-Type', 'video/mp4');
 
     // Spawn yt-dlp to stream to stdout
-    // Using -o - tells yt-dlp to output to stdout
-    const format = formatId ? `-f "${formatId}+bestaudio/best"` : '-f "best"';
-    const ytProcess = exec(`yt-dlp ${format} -o - "${url}"`);
+    const ytProcess = spawnVideoDownload(url, formatId);
 
     ytProcess.stdout.pipe(res);
 
     ytProcess.on('error', (err) => {
       console.error('yt-dlp stream error:', err);
       if (!res.headersSent) res.status(500).json({ error: 'Download failed' });
+    });
+
+    ytProcess.stderr.on('data', (data) => {
+      // Optional: Log stderr for debugging but don't send to user
+      if (data.toString().includes('ERROR')) {
+        console.error(`yt-dlp error: ${data}`);
+      }
     });
 
   } catch (err) {

@@ -40,3 +40,7 @@ Thumbs.db
 
 # Misc
 .gemini/
+cookies.txt
+env_cookies.txt
+backend/cookies.txt
+backend/env_cookies.txt
