@@ -21,7 +21,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-venv \
     poppler-utils \
     ffmpeg \
+    curl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install Deno for yt-dlp (required for YouTube extraction)
+RUN curl -fsSL https://deno.land/x/install/install.sh | sh
+ENV DENO_INSTALL="/root/.deno"
+ENV PATH="$DENO_INSTALL/bin:$PATH"
 
 # Set up Python virtual environment
 ENV VIRTUAL_ENV=/opt/venv
