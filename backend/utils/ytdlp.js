@@ -17,6 +17,9 @@ export const getCommonYtdlpArgs = () => {
     '--add-header', 'referer:https://www.instagram.com/',
     '--add-header', 'accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     '--add-header', 'accept-language:en-US,en;q=0.9',
+    '--remote-components', 'ejs:github',
+    '--extractor-args', 'youtube:player_client=web,android',
+    '--geo-bypass',
   ];
 
   // 1. Check for cookies.txt in the backend root (local dev)
