@@ -41,24 +41,46 @@ export const getCommonYtdlpArgs = () => {
  */
 export const fetchVideoInfo = async (url) => {
   const args = [
-    'yt-dlp',
     '-j',
     '--no-playlist',
     ...getCommonYtdlpArgs(),
-    `"${url}"`
+    url
   ];
 
-  try {
-    const { stdout } = await execAsync(args.join(' '));
-    return JSON.parse(stdout);
-  } catch (error) {
-    console.error('fetchVideoInfo error:', error.message);
-    // If it's a 429, we might want to throw a more specific error
-    if (error.message.includes('429')) {
-      throw new Error('Rate limited by the platform. Please try again later or provide cookies.');
-    }
-    throw error;
-  }
+  return new Promise((resolve, reject) => {
+    const child = spawn('yt-dlp', args);
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    child.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    child.on('close', (code) => {
+      if (code === 0) {
+        try {
+          resolve(JSON.parse(stdout));
+        } catch (e) {
+          reject(new Error('Failed to parse yt-dlp output'));
+        }
+      } else {
+        console.error('yt-dlp error output:', stderr);
+        if (stderr.includes('429')) {
+          reject(new Error('Rate limited by the platform. Please try again later or provide cookies.'));
+        } else {
+          reject(new Error(`yt-dlp exited with code ${code}: ${stderr}`));
+        }
+      }
+    });
+
+    child.on('error', (err) => {
+      reject(err);
+    });
+  });
 };
 
 /**
