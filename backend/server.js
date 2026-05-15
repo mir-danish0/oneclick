@@ -9,6 +9,7 @@ import fs from 'fs';
 
 import { globalLimiter } from './middleware/rateLimit.js';
 import { startPeriodicCleanup } from './utils/cleanupFiles.js';
+import { startKeepAlive } from './utils/keepAlive.js';
 
 import convertRoutes from './routes/convert.js';
 import pdfRoutes from './routes/pdf.js';
@@ -95,6 +96,9 @@ async function startupChecks() {
 
 // Start periodic cleanup of tmp folder
 startPeriodicCleanup(TMP_DIR);
+
+// Start keep-alive cron job
+startKeepAlive();
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);

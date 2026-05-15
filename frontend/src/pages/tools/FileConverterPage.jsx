@@ -102,21 +102,21 @@ export default function FileConverterPage() {
       <FileToolLayout tool={tool} processLabel="Convert File" onProcess={handleProcess} />
       
       {/* Info section */}
-      <div className="mt-8 pt-6 border-t border-[#1e1e32]">
-        <h3 className="text-sm font-semibold text-white mb-3 font-[Space_Grotesk]">How it works</h3>
+      <div className="mt-8 pt-6 border-t border-[var(--color-border)]">
+        <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3 font-[var(--font-display)]">How it works</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
             { step: '1', title: 'Upload', desc: 'Drop your file or click to browse' },
             { step: '2', title: 'Convert', desc: 'We process your file securely' },
             { step: '3', title: 'Download', desc: 'Get your converted file instantly' },
           ].map(s => (
-            <div key={s.step} className="flex items-start gap-3 p-3 rounded-xl bg-[#0a0a0f]">
-              <div className="w-7 h-7 rounded-lg bg-[#00d4ff15] flex items-center justify-center text-[#00d4ff] text-xs font-bold shrink-0">
+            <div key={s.step} className="flex items-start gap-3 p-3 rounded-xl bg-[var(--color-bg-primary)]">
+              <div className="w-7 h-7 rounded-lg bg-[var(--color-accent-blue-10)] flex items-center justify-center text-[var(--color-accent-blue)] text-xs font-bold shrink-0">
                 {s.step}
               </div>
               <div>
-                <p className="text-sm font-medium text-white">{s.title}</p>
-                <p className="text-xs text-[#4a4a6a]">{s.desc}</p>
+                <p className="text-sm font-medium text-[var(--color-text-primary)]">{s.title}</p>
+                <p className="text-xs text-[var(--color-text-muted)]">{s.desc}</p>
               </div>
             </div>
           ))}

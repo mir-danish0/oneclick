@@ -10,7 +10,6 @@ export const categories = [
   { id: 'file-converter', name: 'File Converter', emoji: '🗂️', color: '#00d4ff' },
   { id: 'image-converter', name: 'Image Converter', emoji: '🖼️', color: '#a855f7' },
   { id: 'pdf-tools', name: 'PDF Tools', emoji: '📄', color: '#00ff88' },
-  { id: 'social-downloader', name: 'Social Downloader', emoji: '⬇️', color: '#f43f5e' },
   { id: 'link-tools', name: 'Link Tools', emoji: '🔗', color: '#f59e0b' },
   { id: 'text-tools', name: 'Text Tools', emoji: '🔤', color: '#06b6d4' },
 ];
@@ -240,61 +239,6 @@ export const tools = [
     type: 'pdf-pagenumber',
   },
 
-  // SOCIAL MEDIA DOWNLOADER
-  {
-    id: 'facebook-downloader',
-    name: 'Facebook Video Downloader',
-    description: 'Download videos from Facebook in HD quality.',
-    category: 'social-downloader',
-    icon: Globe,
-    type: 'social-download',
-    placeholder: 'https://www.facebook.com/watch?v=...',
-  },
-  {
-    id: 'instagram-downloader',
-    name: 'Instagram Downloader',
-    description: 'Download Instagram videos, reels, and stories.',
-    category: 'social-downloader',
-    icon: CirclePlay,
-    type: 'social-download',
-    placeholder: 'https://www.instagram.com/reel/...',
-  },
-  {
-    id: 'youtube-downloader',
-    name: 'YouTube Downloader',
-    description: 'Download YouTube videos in multiple qualities.',
-    category: 'social-downloader',
-    icon: Play,
-    type: 'social-download',
-    placeholder: 'https://www.youtube.com/watch?v=...',
-  },
-  {
-    id: 'twitter-downloader',
-    name: 'Twitter/X Downloader',
-    description: 'Download videos from Twitter/X posts.',
-    category: 'social-downloader',
-    icon: AtSign,
-    type: 'social-download',
-    placeholder: 'https://twitter.com/user/status/...',
-  },
-  {
-    id: 'tiktok-downloader',
-    name: 'TikTok Downloader',
-    description: 'Download TikTok videos without watermark.',
-    category: 'social-downloader',
-    icon: Video,
-    type: 'social-download',
-    placeholder: 'https://www.tiktok.com/@user/video/...',
-  },
-  {
-    id: 'pinterest-downloader',
-    name: 'Pinterest Downloader',
-    description: 'Download high-quality images from Pinterest.',
-    category: 'social-downloader',
-    icon: MapPin,
-    type: 'social-download',
-    placeholder: 'https://www.pinterest.com/pin/...',
-  },
 
   // LINK TOOLS
   {

@@ -14,8 +14,8 @@ export default function ToolPageWrapper({ children }) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
         <p className="text-6xl mb-4">🔍</p>
-        <h1 className="text-2xl font-bold text-white font-[Space_Grotesk] mb-2">Tool Not Found</h1>
-        <p className="text-[#8888aa] mb-6">The tool you're looking for doesn't exist.</p>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] font-[Space_Grotesk] mb-2">Tool Not Found</h1>
+        <p className="text-[var(--color-text-secondary)] mb-6">The tool you're looking for doesn't exist.</p>
         <Link to="/" className="btn-primary px-6 py-3 rounded-xl no-underline"><span>Back to Home</span></Link>
       </div>
     );
@@ -26,14 +26,14 @@ export default function ToolPageWrapper({ children }) {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-[#8888aa] mb-8">
-        <Link to="/" className="hover:text-white transition-colors">Home</Link>
+      <div className="flex items-center gap-2 text-sm text-[var(--color-text-secondary)] mb-8">
+        <Link to="/" className="hover:text-[var(--color-text-primary)] transition-colors">Home</Link>
         <span>/</span>
-        <Link to={`/category/${tool.category}`} className="hover:text-white transition-colors">
+        <Link to={`/category/${tool.category}`} className="hover:text-[var(--color-text-primary)] transition-colors">
           {category?.name}
         </Link>
         <span>/</span>
-        <span className="text-white">{tool.name}</span>
+        <span className="text-[var(--color-text-primary)]">{tool.name}</span>
       </div>
 
       {/* Header */}
@@ -45,20 +45,21 @@ export default function ToolPageWrapper({ children }) {
           <Icon className="w-7 h-7" style={{ color: category?.color || '#00d4ff' }} />
         </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white font-[Space_Grotesk]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] font-[Space_Grotesk]">
             {tool.name}
           </h1>
-          <p className="text-[#8888aa] text-sm mt-1">{tool.description}</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mt-1">{tool.description}</p>
         </div>
       </div>
 
       {/* Tool Content */}
-      <div className="glass-card rounded-2xl border border-[#1e1e32] p-6 sm:p-8">
+      <div className="glass-card rounded-2xl border border-[var(--color-border)] p-6 sm:p-8">
         {children}
       </div>
     </div>
   );
 }
+
 
 /* ============ Reusable File Tool Layout ============ */
 export function FileToolLayout({ tool, processLabel = 'Convert', onProcess }) {
@@ -76,10 +77,12 @@ export function FileToolLayout({ tool, processLabel = 'Convert', onProcess }) {
 
   const removeFile = (idx) => {
     setFiles(prev => prev.filter((_, i) => i !== idx));
+    if (files.length <= 1) setDone(false);
   };
 
   const handleProcess = async () => {
     setProcessing(true);
+    setDone(false);
     try {
       if (onProcess) {
         const result = await onProcess(files);
@@ -87,37 +90,45 @@ export function FileToolLayout({ tool, processLabel = 'Convert', onProcess }) {
           setDownloadData(result);
         }
       } else {
-        // Simulate processing
         await new Promise(r => setTimeout(r, 2000));
       }
       setDone(true);
       toast.success('Processing complete!');
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('Processing failed. Please try again.');
     }
     setProcessing(false);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {files.length === 0 ? (
-        <DropZone
-          onFilesSelected={handleFiles}
-          accept={tool.accept}
-          multiple={tool.multiple || false}
-        />
+        <div className="animate-in fade-in zoom-in duration-300">
+          <DropZone
+            onFilesSelected={handleFiles}
+            accept={tool.accept}
+            multiple={tool.multiple || false}
+          />
+        </div>
       ) : (
-        <>
+        <div className="animate-in slide-in-from-bottom-4 duration-500">
           {/* File list */}
-          <div className="space-y-3">
+          <div className="space-y-3 mb-8">
+            <h3 className="text-xs font-bold text-[var(--color-text-muted)] uppercase tracking-wider mb-2">Selected Files</h3>
             {files.map((file, i) => (
-              <div key={i} className="flex items-center gap-3 bg-[#0f0f1a] rounded-xl p-4 border border-[#1e1e32]">
-                <FileText className="w-5 h-5 text-[#00d4ff] shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">{file.name}</p>
-                  <p className="text-xs text-[#4a4a6a]">{(file.size / 1024).toFixed(1)} KB</p>
+              <div key={i} className="group flex items-center gap-4 bg-[var(--color-bg-secondary)] rounded-2xl p-4 border border-[var(--color-border)] hover:border-[var(--color-accent-blue-20)] transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-[var(--color-border)] flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
+                  <FileText className="w-5 h-5 text-[var(--color-accent-blue)]" />
                 </div>
-                <button onClick={() => removeFile(i)} className="text-[#4a4a6a] hover:text-red-400 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[var(--color-text-primary)] truncate">{file.name}</p>
+                  <p className="text-xs text-[var(--color-text-muted)]">{(file.size / 1024).toFixed(1)} KB</p>
+                </div>
+                <button 
+                  onClick={() => removeFile(i)} 
+                  className="p-2 rounded-lg text-[var(--color-text-muted)] hover:text-red-400 hover:bg-red-400/10 transition-all opacity-0 group-hover:opacity-100"
+                >
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -125,176 +136,132 @@ export function FileToolLayout({ tool, processLabel = 'Convert', onProcess }) {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={handleProcess}
-              disabled={processing}
-              className="btn-primary px-8 py-3 rounded-xl text-base font-bold flex items-center justify-center gap-2 disabled:opacity-50"
-            >
-              <span className="flex items-center gap-2">
-                {processing ? (
-                  <><Loader2 className="w-5 h-5 animate-spin" /> Processing...</>
-                ) : done ? (
-                  <><CheckCircle2 className="w-5 h-5" /> Done!</>
-                ) : (
-                  processLabel
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 py-4 border-t border-[var(--color-border)]">
+            {!done ? (
+              <button
+                onClick={handleProcess}
+                disabled={processing}
+                className={`group relative overflow-hidden px-10 py-4 rounded-2xl text-base font-bold transition-all duration-500 
+                  ${processing ? 'w-full bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]' : 'bg-gradient-to-r from-[var(--color-accent-blue)] to-[var(--color-accent-green)] text-[var(--color-bg-primary)] hover:shadow-[0_0_30px_var(--color-accent-blue-20)] hover:scale-105'}`}
+              >
+                {processing && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-accent-blue-20)] to-[var(--color-accent-green-10)] animate-pulse" />
                 )}
-              </span>
-            </button>
-            <button
-              onClick={() => { setFiles([]); setDone(false); setDownloadData(null); }}
-              className="px-6 py-3 rounded-xl border border-[#2a2a45] text-[#8888aa] hover:text-white hover:border-[#00d4ff44] transition-all text-sm"
-            >
-              Clear Files
-            </button>
+                <span className="relative flex items-center gap-2 justify-center">
+                  {processing ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Analyzing & Processing...</>
+                  ) : (
+                    <>{processLabel}</>
+                  )}
+                </span>
+              </button>
+            ) : (
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center animate-in zoom-in duration-300">
+                <button 
+                  onClick={() => {
+                    if (downloadData) {
+                      const a = document.createElement('a');
+                      a.href = downloadData.downloadUrl;
+                      a.download = downloadData.filename;
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                    }
+                  }}
+                  className="btn-primary px-10 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 bg-gradient-to-r from-[#00ff88] to-[#00d4ff]"
+                >
+                  <Download className="w-5 h-5" /> Download Result
+                </button>
+                <button
+                  onClick={() => { setFiles([]); setDone(false); setDownloadData(null); }}
+                  className="px-8 py-4 rounded-2xl border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-secondary)] transition-all font-medium"
+                >
+                  Start New Task
+                </button>
+              </div>
+            )}
           </div>
 
-          {/* Result */}
-          {done && (
-            <div className="bg-[#00ff8810] border border-[#00ff8833] rounded-xl p-5 flex items-center gap-4 animate-slide-up">
-              <CheckCircle2 className="w-6 h-6 text-[#00ff88] shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-white">Files processed successfully!</p>
-                <p className="text-xs text-[#8888aa]">Your converted files are ready to download.</p>
-              </div>
-              <button 
-                onClick={() => {
-                  if (downloadData) {
-                    const a = document.createElement('a');
-                    a.href = downloadData.downloadUrl;
-                    a.download = downloadData.filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
-                  } else {
-                     toast('File was downloaded automatically.');
-                  }
-                }}
-                className="btn-primary px-5 py-2 rounded-lg text-sm flex items-center gap-2"
-              >
-                <span className="flex items-center gap-2"><Download className="w-4 h-4" /> Download</span>
-              </button>
+          {/* Success Badge */}
+          {done && !processing && (
+            <div className="flex items-center justify-center gap-2 text-[var(--color-accent-green)] animate-bounce mt-4">
+              <CheckCircle2 className="w-4 h-4" />
+              <span className="text-xs font-bold uppercase tracking-widest">Processing Complete</span>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );
 }
-
 /* ============ Social Downloader Layout ============ */
 export function SocialDownloaderLayout({ tool }) {
   const [url, setUrl] = useState('');
+  const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState(null);
 
-  const handleFetch = async () => {
-    if (!url.trim()) return toast.error('Please paste a valid URL');
+  const fetchInfo = async () => {
+    if (!url) return toast.error('Please paste a URL');
     setLoading(true);
-    setResults(null);
+    setInfo(null);
     try {
-      const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
-      const response = await fetch(`${apiBase}/api/social/info?url=${encodeURIComponent(url)}`);
-      if (!response.ok) throw new Error('Could not fetch video info');
-      const data = await response.json();
-      
-      // Map backend formats to the UI format
-      const qualities = data.formats.map(f => ({
-        formatId: f.formatId,
-        label: `${f.resolution} (${f.extension})`,
-        size: f.filesize ? `${(f.filesize / (1024 * 1024)).toFixed(1)} MB` : 'Size unknown',
-        badge: f.note.includes('premium') ? 'HQ' : null,
-        extension: f.extension
-      }));
-
-      setResults({
-        title: data.title,
-        thumbnail: data.thumbnail,
-        qualities: qualities,
-      });
-      toast.success('Video found!');
-    } catch (error) {
-      console.error(error);
-      toast.error('Failed to fetch video. Check the URL and try again.');
+      const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/social/info?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setInfo(data);
+      toast.success('Video info fetched!');
+    } catch (err) {
+      toast.error(err.message || 'Failed to fetch video info');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
-  };
-
-  const handleDownload = async (formatId, extension) => {
-    const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
-    const downloadUrl = `${apiBase}/api/social/download?url=${encodeURIComponent(url)}&formatId=${formatId}`;
-    window.open(downloadUrl, '_blank');
-    toast.success('Download starting...');
   };
 
   return (
-    <div className="space-y-6">
-      {/* URL Input */}
+    <div className="space-y-8">
+      {/* Input Section */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
-          type="url"
+          type="text"
           value={url}
-          onChange={e => setUrl(e.target.value)}
-          placeholder={tool.placeholder || 'Paste video URL here...'}
-          className="flex-1 bg-[#0f0f1a] border border-[#2a2a45] rounded-xl px-5 py-3.5 text-white placeholder:text-[#4a4a6a] 
-            focus:outline-none focus:border-[#00d4ff55] search-glow transition-all text-sm"
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder={`Paste ${tool.name} link here...`}
+          className="flex-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-2xl px-6 py-4 text-[var(--color-text-primary)] focus:outline-none focus:border-[var(--color-accent-blue-20)] transition-all"
         />
         <button
-          onClick={handleFetch}
+          onClick={fetchInfo}
           disabled={loading}
-          className="btn-primary px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shrink-0 disabled:opacity-50"
+          className="btn-primary px-8 py-4 rounded-2xl font-bold disabled:opacity-50 min-w-[140px]"
         >
-          <span className="flex items-center gap-2">
-            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
-            {loading ? 'Fetching...' : 'Fetch'}
-          </span>
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Fetch Video'}
         </button>
       </div>
 
-      {/* Results */}
-      {results && (
-        <div className="space-y-4 animate-slide-up">
-          {/* Video info */}
-          <div className="bg-[#0f0f1a] rounded-xl p-5 border border-[#1e1e32]">
-            <div className="flex gap-4">
-              <div className="w-32 h-20 rounded-lg bg-[#1e1e32] flex items-center justify-center shrink-0 overflow-hidden">
-                {results.thumbnail ? (
-                  <img src={results.thumbnail} alt="" className="w-full h-full object-cover" />
-                ) : (
-                  <span className="text-3xl">🎬</span>
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">{results.title}</p>
-                <p className="text-xs text-[#4a4a6a] mt-1">Ready to download</p>
+      {/* Info Display */}
+      {info && (
+        <div className="animate-in slide-in-from-bottom-4 duration-500 space-y-6">
+          <div className="flex flex-col md:flex-row gap-6 p-6 bg-[var(--color-bg-secondary)] rounded-3xl border border-[var(--color-border)]">
+            <img src={info.thumbnail} alt="" className="w-full md:w-48 h-32 object-cover rounded-2xl shadow-xl" />
+            <div className="flex-1 min-w-0">
+              <h3 className="text-lg font-bold text-[var(--color-text-primary)] mb-2 line-clamp-2">{info.title}</h3>
+              <p className="text-sm text-[var(--color-text-secondary)] mb-4">Uploader: {info.uploader} • {Math.floor(info.duration / 60)}:{(info.duration % 60).toString().padStart(2, '0')}</p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {info.formats.map((f, i) => (
+                  <button
+                    key={i}
+                    onClick={() => window.open(`${import.meta.env.VITE_API_URL || '/api'}/social/download?url=${encodeURIComponent(url)}&formatId=${f.formatId}`)}
+                    className="flex items-center justify-between p-3 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-bright)] hover:border-[var(--color-accent-blue-20)] hover:bg-[var(--color-bg-card-hover)] transition-all group"
+                  >
+                    <div className="text-left">
+                      <p className="text-xs font-bold text-[var(--color-text-primary)] uppercase">{f.resolution}</p>
+                      <p className="text-[10px] text-[var(--color-text-muted)] uppercase">{f.extension} • {(f.filesize / (1024 * 1024)).toFixed(1)} MB</p>
+                    </div>
+                    <Download className="w-4 h-4 text-[var(--color-text-secondary)] group-hover:text-[var(--color-accent-blue)] transition-colors" />
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
-
-          {/* Quality options */}
-          <div className="space-y-2">
-            {results.qualities.map((q, i) => (
-              <div key={i} className="flex items-center gap-4 bg-[#0f0f1a] rounded-xl p-4 border border-[#1e1e32] hover:border-[#00d4ff33] transition-all group">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-white">{q.label}</span>
-                    {q.badge && (
-                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#00ff8820] text-[#00ff88]">
-                        {q.badge}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-[#4a4a6a]">{q.size}</span>
-                </div>
-                <button 
-                  onClick={() => handleDownload(q.formatId, q.extension)}
-                  className="px-5 py-2 rounded-lg bg-[#00d4ff15] text-[#00d4ff] text-sm font-medium hover:bg-[#00d4ff25] transition-all flex items-center gap-1.5"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Download
-                </button>
-              </div>
-            ))}
           </div>
         </div>
       )}

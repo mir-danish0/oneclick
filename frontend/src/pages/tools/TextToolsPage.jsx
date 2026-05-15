@@ -21,7 +21,7 @@ function WordCounter() {
           onChange={e => setText(e.target.value)}
           placeholder="Start typing or paste your text here..."
           rows={8}
-          className="w-full bg-[#0f0f1a] border border-[#2a2a45] rounded-xl p-5 text-white placeholder:text-[#4a4a6a] focus:outline-none focus:border-[#00d4ff55] text-sm resize-none leading-relaxed"
+          className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-bright)] rounded-xl p-5 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue-20)] text-sm resize-none leading-relaxed"
         />
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
@@ -31,9 +31,9 @@ function WordCounter() {
             { label: 'Paragraphs', value: paragraphs, color: '#f59e0b' },
             { label: 'Read Time', value: `${readingTime}m`, color: '#f43f5e' },
           ].map(s => (
-            <div key={s.label} className="bg-[#0f0f1a] border border-[#1e1e32] rounded-xl p-4 text-center">
-              <p className="text-2xl font-bold font-[Space_Grotesk]" style={{ color: s.color }}>{s.value}</p>
-              <p className="text-xs text-[#4a4a6a] mt-1">{s.label}</p>
+            <div key={s.label} className="bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-xl p-4 text-center">
+              <p className="text-2xl font-bold font-[var(--font-display)]" style={{ color: s.color }}>{s.value}</p>
+              <p className="text-xs text-[var(--color-text-muted)] mt-1">{s.label}</p>
             </div>
           ))}
         </div>
@@ -77,18 +77,18 @@ function CaseConverter() {
           onChange={e => setText(e.target.value)}
           placeholder="Type or paste text to convert..."
           rows={6}
-          className="w-full bg-[#0f0f1a] border border-[#2a2a45] rounded-xl p-5 text-white placeholder:text-[#4a4a6a] focus:outline-none focus:border-[#00d4ff55] text-sm resize-none"
+          className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-bright)] rounded-xl p-5 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:border-[var(--color-accent-blue-20)] text-sm resize-none"
         />
         <div className="flex flex-wrap gap-2">
           {cases.map(c => (
             <button key={c.id} onClick={() => convert(c.id)}
-              className="px-4 py-2 rounded-xl bg-[#13131f] border border-[#1e1e32] text-sm text-[#8888aa] hover:text-white hover:border-[#00d4ff44] transition-all">
+              className="px-4 py-2 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-accent-blue-20)] transition-all">
               {c.label}
             </button>
           ))}
         </div>
         {text && (
-          <button onClick={copy} className="px-5 py-2 rounded-lg bg-[#00d4ff15] text-[#00d4ff] text-sm font-medium hover:bg-[#00d4ff25] flex items-center gap-1.5">
+          <button onClick={copy} className="px-5 py-2 rounded-lg bg-[var(--color-accent-blue-10)] text-[var(--color-accent-blue)] text-sm font-medium hover:bg-[var(--color-accent-blue-20)] flex items-center gap-1.5">
             {copied ? <><Check className="w-3.5 h-3.5" /> Copied</> : <><Copy className="w-3.5 h-3.5" /> Copy Text</>}
           </button>
         )}
@@ -130,14 +130,14 @@ function LoremGenerator() {
       <div className="space-y-6">
         <div className="flex flex-wrap gap-3 items-end">
           <div>
-            <label className="block text-xs text-[#4a4a6a] mb-1">Count</label>
+            <label className="block text-xs text-[var(--color-text-muted)] mb-1">Count</label>
             <input type="number" value={count} onChange={e => setCount(Math.max(1, parseInt(e.target.value) || 1))} min={1} max={100}
-              className="bg-[#0f0f1a] border border-[#2a2a45] rounded-xl px-4 py-2.5 text-white text-sm w-24 focus:outline-none focus:border-[#00d4ff55]" />
+              className="bg-[var(--color-bg-secondary)] border border-[var(--color-border-bright)] rounded-xl px-4 py-2.5 text-[var(--color-text-primary)] text-sm w-24 focus:outline-none focus:border-[var(--color-accent-blue-20)]" />
           </div>
           <div className="flex gap-2">
             {['paragraphs', 'sentences', 'words'].map(t => (
               <button key={t} onClick={() => setType(t)}
-                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${type === t ? 'bg-[#00d4ff] text-[#0a0a0f]' : 'bg-[#1e1e32] text-[#8888aa]'}`}>
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${type === t ? 'bg-[var(--color-accent-blue)] text-[var(--color-bg-primary)]' : 'bg-[var(--color-bg-card)] text-[var(--color-text-secondary)]'}`}>
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
             ))}
@@ -147,9 +147,9 @@ function LoremGenerator() {
         {output && (
           <div className="relative">
             <textarea readOnly value={output} rows={8}
-              className="w-full bg-[#0f0f1a] border border-[#2a2a45] rounded-xl p-5 text-sm text-[#8888aa] focus:outline-none resize-none leading-relaxed" />
-            <button onClick={copy} className="absolute top-3 right-3 p-2 rounded-lg bg-[#1e1e32] hover:bg-[#00d4ff22] text-[#8888aa] hover:text-[#00d4ff]">
-              {copied ? <Check className="w-4 h-4 text-[#00ff88]" /> : <Copy className="w-4 h-4" />}
+              className="w-full bg-[var(--color-bg-secondary)] border border-[var(--color-border-bright)] rounded-xl p-5 text-sm text-[var(--color-text-secondary)] focus:outline-none resize-none leading-relaxed" />
+            <button onClick={copy} className="absolute top-3 right-3 p-2 rounded-lg bg-[var(--color-bg-card)] hover:bg-[var(--color-accent-blue-10)] text-[var(--color-text-secondary)] hover:text-[var(--color-accent-blue)]">
+              {copied ? <Check className="w-4 h-4 text-[var(--color-accent-green)]" /> : <Copy className="w-4 h-4" />}
             </button>
           </div>
         )}
@@ -163,11 +163,11 @@ function TextToSpeechPlaceholder() {
   return (
     <ToolPageWrapper>
       <div className="text-center py-12">
-        <div className="w-20 h-20 rounded-2xl bg-[#00d4ff10] flex items-center justify-center mx-auto mb-5">
-          {tool && <tool.icon className="w-10 h-10 text-[#00d4ff]" />}
+        <div className="w-20 h-20 rounded-2xl bg-[var(--color-accent-blue-10)] flex items-center justify-center mx-auto mb-5">
+          {tool && <tool.icon className="w-10 h-10 text-[var(--color-accent-blue)]" />}
         </div>
-        <h3 className="text-xl font-bold text-white font-[Space_Grotesk] mb-2">Text to Speech</h3>
-        <p className="text-[#8888aa] mb-4 max-w-md mx-auto">Convert text into natural-sounding audio.</p>
+        <h3 className="text-xl font-bold text-[var(--color-text-primary)] font-[var(--font-display)] mb-2">Text to Speech</h3>
+        <p className="text-[var(--color-text-secondary)] mb-4 max-w-md mx-auto">Convert text into natural-sounding audio.</p>
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f59e0b15] border border-[#f59e0b33]">
           <span className="text-sm text-[#f59e0b] font-medium">🚧 Coming Soon — API integration required</span>
         </div>

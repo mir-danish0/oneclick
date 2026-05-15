@@ -12,8 +12,8 @@ export default function Category() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
         <p className="text-6xl mb-4">🔍</p>
-        <h1 className="text-2xl font-bold text-white font-[Space_Grotesk] mb-2">Category Not Found</h1>
-        <p className="text-[#8888aa] mb-6">This category doesn't exist.</p>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] font-[var(--font-display)] mb-2">Category Not Found</h1>
+        <p className="text-[var(--color-text-secondary)] mb-6">This category doesn't exist.</p>
         <Link to="/" className="btn-primary px-6 py-3 rounded-xl no-underline"><span>Back to Home</span></Link>
       </div>
     );
@@ -24,7 +24,7 @@ export default function Category() {
       {/* Back link */}
       <Link
         to="/"
-        className="inline-flex items-center gap-2 text-sm text-[#8888aa] hover:text-white transition-colors mb-8 no-underline"
+        className="inline-flex items-center gap-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-8 no-underline"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to all tools
@@ -34,11 +34,11 @@ export default function Category() {
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-4xl">{category.emoji}</span>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white font-[Space_Grotesk]">
+          <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-primary)] font-[var(--font-display)]">
             {category.name}
           </h1>
         </div>
-        <p className="text-[#8888aa] text-base">
+        <p className="text-[var(--color-text-secondary)] text-base">
           {toolsList.length} tools available in this category
         </p>
       </div>
@@ -51,8 +51,8 @@ export default function Category() {
       </div>
 
       {/* Other Categories */}
-      <div className="border-t border-[#1e1e32] pt-10">
-        <h2 className="text-lg font-semibold text-white font-[Space_Grotesk] mb-5">
+      <div className="border-t border-[var(--color-border)] pt-10">
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] font-[var(--font-display)] mb-5">
           Other Categories
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -60,8 +60,8 @@ export default function Category() {
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className="flex items-center gap-2 p-3 rounded-xl bg-[#13131f] border border-[#1e1e32] hover:border-[#00d4ff44]
-                text-sm text-[#8888aa] hover:text-white transition-all no-underline"
+              className="flex items-center gap-2 p-3 rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-[var(--color-accent-blue-20)]
+                text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-all no-underline"
             >
               <span>{cat.emoji}</span>
               {cat.name}
